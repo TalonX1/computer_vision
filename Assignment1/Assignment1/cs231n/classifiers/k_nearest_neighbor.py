@@ -3,7 +3,6 @@ from builtins import object
 import numpy as np
 from past.builtins import xrange
 
-
 class KNearestNeighbor(object):
     """ a kNN classifier with L2 distance """
 
@@ -76,6 +75,7 @@ class KNearestNeighbor(object):
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+                dists[i][j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
 
                 pass
 
@@ -100,6 +100,7 @@ class KNearestNeighbor(object):
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            dists[i] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
 
             pass
 
@@ -130,6 +131,11 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+        dists += np.sum(self.X_train ** 2, axis=1).reshape(1, num_train)
+        dists += np.sum(X ** 2, axis=1).reshape(num_test, 1)  # reshape for broadcasting
+        dists -= 2 * np.dot(X, self.X_train.T)
+        dists = np.sqrt(dists)
 
         pass
 
@@ -164,6 +170,10 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+            k_min_index=np.argsort(dists[i])[0:k]
+            for j in range(k):
+                closest_y.append(self.y_train[k_min_index[j]])
+
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -176,7 +186,11 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+            y_pred[i] = np.argmax(np.bincount(closest_y))      # 对最近邻列表中的元素出现个数进行计数，然后将出现次数最高的赋值给预测矩阵
+
             pass
+
+
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
