@@ -57,6 +57,10 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+            data_index = np.random.choice(num_train, batch_size, True)
+            X_batch = X[data_index]
+            y_batch = y[data_index]
+
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -71,6 +75,8 @@ class LinearClassifier(object):
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+            self.W += -learning_rate * grad
 
             pass
 
@@ -101,6 +107,8 @@ class LinearClassifier(object):
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        y_pred = np.argmax(np.dot(X, self.W), axis=1)
+        # print(y_pred)
 
         pass
 
