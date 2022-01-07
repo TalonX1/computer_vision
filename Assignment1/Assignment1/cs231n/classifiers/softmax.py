@@ -33,7 +33,34 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    num_classes = W.shape[1]
+    num_train = X.shape[0]
+    loss = 0.0
+
+    for i in range(num_train):
+        scores = X[i].dot(W)              # 行向量
+        scores_shift = np.max(scores)     # 将得分的最大值设置为偏移量
+        scores -= scores_shift
+
+        loss += np.log(np.sum(np.exp(scores)))-scores[y[i]]      # 当前得分行向量全部指数求和的值-正确标签对应的得分
+        dW[:, y[i]] -= X[i]                                      # dW正确标签对应的列向量减去X行向量
+
+        scores_sum = np.exp(scores).sum()
+        for j in range(num_classes):
+            dW[:, j] += np.exp(scores[j]) / scores_sum * X[i]
+
+    loss = loss / num_train + 0.5 * reg * np.sum(W*W)
+    dW = dW / num_train + reg * W
+
+
+
+
+    # loss /= num_train
+    # dW /= num_train
+
     pass
+
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -58,8 +85,25 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    num_train = X.shape[0]
+    num_classes = W.shape[1]
+
+    scores = np.dot(X, W)
+    # scores_shift = np.max(scores, axis=1)
+    # print(scores_shift.shape)
+    # scores -= scores_shift
+    scores -= scores.max(axis=1).reshape(num_train, 1)
+    scores_sum = np.exp(scores).sum(axis=1)
+
+    loss = np.log(scores_sum).sum() - scores[range(num_train), y].sum()
+
+    counts = np.exp(scores) / scores_sum.reshape(num_train, 1)
+    counts[range(num_train),y] -= 1
+    dW = np.dot(X.T, counts)
+
+    loss = loss / num_train + 0.5 * reg * np.sum(W * W)
+    dW = dW / num_train + reg * W
     pass
 
-    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     return loss, dW
